@@ -7,15 +7,19 @@ import java.nio.file.Files;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
+
+import io.lanu.blockchain.Transaction;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+
 
 
 public class Wallet {
-    private final String PATH_PRIVATE = "KeyPair/privateKey";
-    private final String PATH_PUBLIC = "KeyPair/publicKey";
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    public void createKeys(int keyLength, String algorithm) throws NoSuchAlgorithmException {
+    public void createKeys(int keyLength, String algorithm) throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm);
         keyGen.initialize(keyLength);
         KeyPair pair = keyGen.generateKeyPair();
@@ -42,22 +46,22 @@ public class Wallet {
     }
 
     public void loadKeyPair(String algorithm) throws Exception {
-        loadPrivate(PATH_PRIVATE, algorithm);
-        loadPublic(PATH_PUBLIC, algorithm);
+        loadPrivate("KeyPair/privateKey", algorithm);
+        loadPublic("KeyPair/publicKey", algorithm);
     }
 
-    public void printKeys(){
-        System.out.println("Public key - " + getHexString(getPublicKey().getEncoded()));
-        System.out.println("Private key - " + getHexString(getPrivateKey().getEncoded()));
+    public void printKeys() throws DecoderException {
+        System.out.println("Public key - " + Hex.encodeHexString(getPublicKey().getEncoded()));
+        System.out.println("Private key - " + Hex.encodeHexString(getPrivateKey().getEncoded()));
     }
 
-    //String representation
-    public String getHexString(byte[] b) {
-        String result = "";
-        for (int i = 0; i < b.length; i++) {
-            result += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
-        }
-        return result;
+    public Transaction signTransaction(Transaction transaction) throws Exception{
+        Signature rsa = Signature.getInstance("SHA1withRSA");
+        rsa.initSign(getPrivateKey());
+        rsa.update(transaction.getHash().getBytes());
+        byte[] signature = rsa.sign();
+        transaction.setSignature(Hex.encodeHexString(signature));
+        return transaction;
     }
 
     private void loadPrivate(String filename, String algorithm) throws Exception {

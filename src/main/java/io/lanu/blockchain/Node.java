@@ -10,9 +10,9 @@ public class Node {
         Wallet gk;
         try {
             gk = new Wallet();
-            //gk.createKeys(1024, "RSA");
-            //gk.writeKeyToFile("KeyPair/publicKey", gk.getPublicKey().getEncoded());
-            //gk.writeKeyToFile("KeyPair/privateKey", gk.getPrivateKey().getEncoded());
+            gk.createKeys(1024, "RSA");
+            gk.writeKeyToFile("KeyPair/publicKey", gk.getPublicKey().getEncoded());
+            gk.writeKeyToFile("KeyPair/privateKey", gk.getPrivateKey().getEncoded());
             gk.loadKeyPair("RSA");
             gk.printKeys();
         } catch (NoSuchAlgorithmException | IOException e) {
