@@ -1,4 +1,4 @@
-package io.lanu.blockchain;
+package io.lanu.blockchain.entities;
 
 import lombok.*;
 import org.apache.commons.codec.digest.DigestUtils;

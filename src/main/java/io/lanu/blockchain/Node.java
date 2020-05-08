@@ -1,44 +1,25 @@
 package io.lanu.blockchain;
 
-import io.lanu.blockchain.util.Wallet;
+import io.lanu.blockchain.services.NodeService;
+import static io.lanu.blockchain.services.NodeService.ignite;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 public class Node {
 
-    private final List<Block> chain = new ArrayList<>();
-    private final List<Transaction> openTransactionsList = new ArrayList<>();
-    private Wallet wallet;
-
-    public void addTransaction(){
-        TransactionValue value = getTransactionValue();
-        Transaction transaction = new Transaction("Serhiy", value.recipient, value.amount, "");
-        openTransactionsList.add(transaction);
+    private static class SingletonHolder {
+        private static final NodeService INSTANCE = ignite();
     }
 
-    public TransactionValue getTransactionValue(){
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Recipient - ");
-        String recipient = scanner.nextLine();
-        System.out.println("Amount - ");
-        double amount = scanner.nextDouble();
-        return new TransactionValue(recipient, amount);
+    private static NodeService getInstance() {
+        return Node.SingletonHolder.INSTANCE;
     }
 
-    public void printOpenTransactions(){
-        openTransactionsList.forEach(System.out::println);
+    public static void addTransaction(){
+        getInstance().addTransaction();
     }
 
-
-    private static class TransactionValue{
-        private String recipient;
-        private double amount;
-
-        public TransactionValue(String recipient, double amount) {
-            this.recipient = recipient;
-            this.amount = amount;
-        }
+    public static void printOpenTransactions(){
+        getInstance().printOpenTransactions();
     }
+
 }

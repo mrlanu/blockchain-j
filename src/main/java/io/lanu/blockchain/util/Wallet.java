@@ -1,6 +1,6 @@
 package io.lanu.blockchain.util;
 
-import io.lanu.blockchain.Transaction;
+import io.lanu.blockchain.entities.Transaction;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 

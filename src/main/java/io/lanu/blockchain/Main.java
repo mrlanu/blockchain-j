@@ -1,5 +1,6 @@
 package io.lanu.blockchain;
 
+import static io.lanu.blockchain.Node.*;
 import java.util.Scanner;
 
 public class Main {
@@ -16,26 +17,28 @@ public class Main {
             System.err.println(e.getMessage());
         }*/
 
-        var node = new Node();
-
         while (true){
             Scanner scanner = new Scanner(System.in);
-            System.out.println();
-            System.out.println("Please choose.");
-            System.out.println("1 - Add new Transaction");
-            System.out.println("q - quit");
+            printChoice();
             String choice = scanner.nextLine();
             //clear console
             /*System.out.print("\033[H\033[2J");
             System.out.flush();*/
             if (choice.equals("1")){
-                node.addTransaction();
-                node.printOpenTransactions();
+                addTransaction();
+                printOpenTransactions();
             }
             if (choice.equals("q")){
                 scanner.close();
                 break;
             }
         }
+    }
+
+    private static void printChoice(){
+        System.out.println();
+        System.out.println("Please choose.");
+        System.out.println("1 - Add new Transaction");
+        System.out.println("q - quit");
     }
 }
