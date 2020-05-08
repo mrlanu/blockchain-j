@@ -23,7 +23,7 @@ public class Node {
         System.out.println("Recipient - ");
         String recipient = scanner.nextLine();
         System.out.println("Amount - ");
-        int amount = scanner.nextInt();
+        double amount = scanner.nextDouble();
         return new TransactionValue(recipient, amount);
     }
 
@@ -34,9 +34,9 @@ public class Node {
 
     private static class TransactionValue{
         private String recipient;
-        private int amount;
+        private double amount;
 
-        public TransactionValue(String recipient, int amount) {
+        public TransactionValue(String recipient, double amount) {
             this.recipient = recipient;
             this.amount = amount;
         }

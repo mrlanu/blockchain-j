@@ -11,7 +11,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class Transaction {
     private String sender;
     private String recipient;
-    private int amount;
+    private double amount;
     private String signature;
 
     public String getHash() {
