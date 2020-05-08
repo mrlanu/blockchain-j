@@ -1,5 +1,9 @@
 package io.lanu.blockchain.util;
 
+import io.lanu.blockchain.Transaction;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,11 +11,6 @@ import java.nio.file.Files;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
-
-import io.lanu.blockchain.Transaction;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 
 
 
@@ -53,6 +52,7 @@ public class Wallet {
     public void printKeys() throws DecoderException {
         System.out.println("Public key - " + Hex.encodeHexString(getPublicKey().getEncoded()));
         System.out.println("Private key - " + Hex.encodeHexString(getPrivateKey().getEncoded()));
+        // Hex.decodeHex(string.toCharArray());
     }
 
     public Transaction signTransaction(Transaction transaction) throws Exception{

@@ -2,22 +2,43 @@ package io.lanu.blockchain;
 
 import io.lanu.blockchain.util.Wallet;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Node {
-    public static void main(String[] args) throws Exception {
-        Wallet gk;
-        try {
-            gk = new Wallet();
-            gk.createKeys(1024, "RSA");
-            gk.writeKeyToFile("KeyPair/publicKey", gk.getPublicKey().getEncoded());
-            gk.writeKeyToFile("KeyPair/privateKey", gk.getPrivateKey().getEncoded());
-            gk.loadKeyPair("RSA");
-            gk.printKeys();
-        } catch (NoSuchAlgorithmException | IOException e) {
-            System.err.println(e.getMessage());
-        }
+
+    private final List<Block> chain = new ArrayList<>();
+    private final List<Transaction> openTransactionsList = new ArrayList<>();
+    private Wallet wallet;
+
+    public void addTransaction(){
+        TransactionValue value = getTransactionValue();
+        Transaction transaction = new Transaction("Serhiy", value.recipient, value.amount, "");
+        openTransactionsList.add(transaction);
     }
 
+    public TransactionValue getTransactionValue(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Recipient - ");
+        String recipient = scanner.nextLine();
+        System.out.println("Amount - ");
+        int amount = scanner.nextInt();
+        return new TransactionValue(recipient, amount);
+    }
+
+    public void printOpenTransactions(){
+        openTransactionsList.forEach(System.out::println);
+    }
+
+
+    private static class TransactionValue{
+        private String recipient;
+        private int amount;
+
+        public TransactionValue(String recipient, int amount) {
+            this.recipient = recipient;
+            this.amount = amount;
+        }
+    }
 }
