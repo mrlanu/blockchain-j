@@ -13,22 +13,21 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class Block<E> implements Serializable {
+public class Block implements Serializable {
 
-    private static final long serialVersionUID = 9L;
+    private static final long serialVersionUID = 7L;
     private long id;
-    public String hash;
-    public String previousHash;
-    private List<E> dataList;
-    private long timeStamp;
-    private int nonce;
+    private long timeStamp; //as number of milliseconds since 1/1/1970.
+    private String previousHash;
+    private List<Transaction> transactionList;
+    private String hash;
+    private long magicNumber;
 
-    public Block(long id, String previousHash, List<E> dataList, int nonce) {
+
+    public Block(long id, String previousHash, List<Transaction> transactionList) {
         this.id = id;
         this.previousHash = previousHash;
-        this.dataList = dataList;
+        this.transactionList = transactionList;
         this.timeStamp = new Date().getTime();
-        this.nonce = nonce;
-        this.hash = null;
     }
 }

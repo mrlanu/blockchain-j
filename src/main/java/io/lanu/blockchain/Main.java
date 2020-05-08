@@ -20,10 +20,14 @@ public class Main {
 
         while (true){
             Scanner scanner = new Scanner(System.in);
+            System.out.println();
             System.out.println("Please choose.");
             System.out.println("1 - Add new Transaction");
             System.out.println("q - quit");
             String choice = scanner.nextLine();
+            //clear console
+            /*System.out.print("\033[H\033[2J");
+            System.out.flush();*/
             if (choice.equals("1")){
                 node.addTransaction();
                 node.printOpenTransactions();

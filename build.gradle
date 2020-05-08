@@ -7,6 +7,15 @@ version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.10
 
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'io.lanu.blockchain.Main'
+        )
+    }
+}
+
 repositories {
     mavenCentral()
 }
