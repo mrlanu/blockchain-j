@@ -11,7 +11,7 @@ public class Node {
     }
 
     private static NodeService getInstance() {
-        return Node.SingletonHolder.INSTANCE;
+        return SingletonHolder.INSTANCE;
     }
 
     public static void addTransaction(){
@@ -20,6 +20,18 @@ public class Node {
 
     public static void printOpenTransactions(){
         getInstance().printOpenTransactions();
+    }
+
+    public static void mineNewBlock(){
+        getInstance().mineBlock();
+    }
+
+    public static boolean verifyChain(){
+        return getInstance().verifyChain();
+    }
+
+    public static void hackChain(){
+        getInstance().hackChain();
     }
 
 }

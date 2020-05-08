@@ -3,6 +3,7 @@ package io.lanu.blockchain.services;
 import io.lanu.blockchain.entities.Block;
 import io.lanu.blockchain.entities.Transaction;
 import io.lanu.blockchain.util.Wallet;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ public final class NodeService {
 
     private NodeService(Wallet wallet) {
         this.wallet = wallet;
+        chain.add(new Block(1L, "", new ArrayList<>()));
     }
 
     public static NodeService ignite() {
@@ -29,6 +31,45 @@ public final class NodeService {
 
     public void printOpenTransactions(){
         openTransactionsList.forEach(System.out::println);
+    }
+
+    public void mineBlock() {
+        Block prevBlock = chain.get(chain.size() - 1);
+        String previousHash = hashBlock(prevBlock);
+        List<Transaction> copyTransactions = new ArrayList<>(openTransactionsList);
+        Block block = new Block(chain.size() + 1, previousHash, copyTransactions);
+        block.setHash(hashBlock(block));
+        //proofOfWork(block);
+        chain.add(block);
+        chain.forEach(System.out::println);
+        openTransactionsList.clear();
+        //writeChainToFile();
+        //System.out.println("Block has been mined.");
+    }
+
+    public Boolean verifyChain() {
+        Block currentBlock;
+        Block previousBlock;
+
+        //loop through the chain to check hashes:
+        for(int i = 1; i < chain.size(); i++) {
+            currentBlock = chain.get(i);
+            previousBlock = chain.get(i-1);
+            //compare registered hash and calculated hash:
+            if(!currentBlock.getPreviousHash().equals(hashBlock(previousBlock))){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void hackChain(){
+        chain.get(1).setMagicNumber(5);
+    }
+
+    private String hashBlock(Block block){
+        return DigestUtils.sha256Hex(block.getId() + block.getPreviousHash() +
+                block.getTimeStamp() + block.getTransactionList() + block.getMagicNumber());
     }
 
     private TransactionValue getTransactionValue(){

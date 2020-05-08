@@ -28,8 +28,18 @@ public class Main {
                 addTransaction();
                 printOpenTransactions();
             }
+            if (choice.equals("2")){
+                mineNewBlock();
+            }
+            if (choice.equals("h")){
+                hackChain();
+            }
             if (choice.equals("q")){
                 scanner.close();
+                break;
+            }
+            if (!verifyChain()){
+                System.out.println("**** Chain is invalid ****");
                 break;
             }
         }
@@ -39,6 +49,8 @@ public class Main {
         System.out.println();
         System.out.println("Please choose.");
         System.out.println("1 - Add new Transaction");
+        System.out.println("2 - Mine new Block");
+        System.out.println("h - hack chain");
         System.out.println("q - quit");
     }
 }
