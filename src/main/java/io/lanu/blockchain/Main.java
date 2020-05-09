@@ -42,7 +42,7 @@ public class Main {
                 System.out.println("**** Chain is invalid ****");
                 break;
             }
-            System.out.println(getBalance("Serhiy"));
+            System.out.println("\nBalance: " + getBalance("Serhiy"));
         }
     }
 

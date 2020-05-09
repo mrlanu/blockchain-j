@@ -28,7 +28,9 @@ public final class NodeService {
     public void addTransaction(){
         TransactionValue value = getTransactionValue();
         Transaction transaction = new Transaction(OWNER, value.recipient, value.amount, "");
-        openTransactionsList.add(transaction);
+        if (verifyTransaction(transaction)){
+            openTransactionsList.add(transaction);
+        }else System.out.println("Not enough money.");
     }
 
     public void printOpenTransactions(){
@@ -51,12 +53,21 @@ public final class NodeService {
     }
 
     public double getBalance(String participant){
-        return chain.stream()
+        double openTransactionsSpent = openTransactionsList.stream()
+                .filter(t -> t.getSender().equals(participant))
+                .mapToDouble(t -> -t.getAmount())
+                .sum();
+        double storedTransactionsBalance = chain.stream()
                 .flatMap(t -> t.getTransactionList()
                         .stream())
                         .filter(t -> t.getSender().equals(participant) || t.getRecipient().equals(participant))
                         .mapToDouble(t -> t.getRecipient().equals(participant) ? t.getAmount() : -t.getAmount())
                         .sum();
+        return storedTransactionsBalance + openTransactionsSpent;
+    }
+
+    private boolean verifyTransaction(Transaction transaction){
+        return getBalance(transaction.getSender()) >= transaction.getAmount();
     }
 
     public Boolean verifyChain() {
