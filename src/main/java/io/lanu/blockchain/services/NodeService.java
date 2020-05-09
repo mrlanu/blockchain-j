@@ -47,6 +47,15 @@ public final class NodeService {
         //System.out.println("Block has been mined.");
     }
 
+    public double getBalance(String participant){
+        return chain.stream()
+                .flatMap(t -> t.getTransactionList()
+                        .stream())
+                        .filter(t -> t.getSender().equals(participant) || t.getRecipient().equals(participant))
+                        .mapToDouble(t -> t.getRecipient().equals(participant) ? t.getAmount() : -t.getAmount())
+                        .sum();
+    }
+
     public Boolean verifyChain() {
         Block currentBlock;
         Block previousBlock;

@@ -30,6 +30,10 @@ public class Node {
         return getInstance().verifyChain();
     }
 
+    public static double getBalance(String participant){
+        return getInstance().getBalance(participant);
+    }
+
     public static void hackChain(){
         getInstance().hackChain();
     }
