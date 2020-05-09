@@ -12,6 +12,8 @@ import java.util.Scanner;
 public final class NodeService {
     private final List<Block> chain = new ArrayList<>();
     private final List<Transaction> openTransactionsList = new ArrayList<>();
+    private double reward = 10;
+    private final String OWNER = "Serhiy";
     private Wallet wallet;
 
     private NodeService(Wallet wallet) {
@@ -25,7 +27,7 @@ public final class NodeService {
 
     public void addTransaction(){
         TransactionValue value = getTransactionValue();
-        Transaction transaction = new Transaction("Serhiy", value.recipient, value.amount, "");
+        Transaction transaction = new Transaction(OWNER, value.recipient, value.amount, "");
         openTransactionsList.add(transaction);
     }
 
@@ -37,6 +39,7 @@ public final class NodeService {
         Block prevBlock = chain.get(chain.size() - 1);
         String previousHash = hashBlock(prevBlock);
         List<Transaction> copyTransactions = new ArrayList<>(openTransactionsList);
+        copyTransactions.add(new Transaction("MINING", OWNER, reward, ""));
         Block block = new Block(chain.size() + 1, previousHash, copyTransactions);
         block.setHash(hashBlock(block));
         //proofOfWork(block);
