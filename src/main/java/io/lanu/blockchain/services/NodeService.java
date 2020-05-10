@@ -21,11 +21,18 @@ public final class NodeService {
 
     private NodeService(Wallet wallet) {
         this.wallet = wallet;
-        chain.add(new Block(1L, "", new ArrayList<>()));
+        createGenesisBlock();
     }
 
     public static NodeService ignite() {
         return new NodeService(null);
+    }
+
+    private void createGenesisBlock() {
+        Block genesisBlock = new Block(1L, "none", new ArrayList<>());
+        proofOfWork(genesisBlock);
+        chain.add(genesisBlock);
+        //writeChainToFile();
     }
 
     public boolean addTransaction(){
