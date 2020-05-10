@@ -25,11 +25,17 @@ public class Main {
             /*System.out.print("\033[H\033[2J");
             System.out.flush();*/
             if (choice.equals("1")){
-                addTransaction();
-                printOpenTransactions();
+                if (addTransaction()){
+                    System.out.println("Transaction has been added.\n");
+                    printOpenTransactions();
+                }else {
+                    System.out.println("Not enough money.");
+                }
             }
             if (choice.equals("2")){
-                mineNewBlock();
+                if (mineNewBlock()){
+                    printChain();
+                }else System.out.println("Error.");
             }
             if (choice.equals("h")){
                 hackChain();

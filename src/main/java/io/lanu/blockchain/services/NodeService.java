@@ -1,5 +1,6 @@
 package io.lanu.blockchain.services;
 
+import com.google.gson.Gson;
 import io.lanu.blockchain.entities.Block;
 import io.lanu.blockchain.entities.Transaction;
 import io.lanu.blockchain.util.Wallet;
@@ -25,31 +26,37 @@ public final class NodeService {
         return new NodeService(null);
     }
 
-    public void addTransaction(){
+    public boolean addTransaction(){
         TransactionValue value = getTransactionValue();
         Transaction transaction = new Transaction(OWNER, value.recipient, value.amount, "");
         if (verifyTransaction(transaction)){
             openTransactionsList.add(transaction);
-        }else System.out.println("Not enough money.");
+            return true;
+        }
+        return false;
     }
 
-    public void printOpenTransactions(){
-        openTransactionsList.forEach(System.out::println);
-    }
-
-    public void mineBlock() {
+    public boolean mineBlock() {
         Block prevBlock = chain.get(chain.size() - 1);
         String previousHash = hashBlock(prevBlock);
         List<Transaction> copyTransactions = new ArrayList<>(openTransactionsList);
         copyTransactions.add(new Transaction("MINING", OWNER, reward, ""));
         Block block = new Block(chain.size() + 1, previousHash, copyTransactions);
-        block.setHash(hashBlock(block));
         //proofOfWork(block);
         chain.add(block);
-        chain.forEach(System.out::println);
         openTransactionsList.clear();
         //writeChainToFile();
         //System.out.println("Block has been mined.");
+        return true;
+    }
+
+    public void printChain(){
+        System.out.println();
+        chain.forEach(b -> System.out.println(b + "\n"));
+    }
+
+    public void printOpenTransactions(){
+        openTransactionsList.forEach(System.out::println);
     }
 
     public double getBalance(String participant){
@@ -91,8 +98,9 @@ public final class NodeService {
     }
 
     private String hashBlock(Block block){
-        return DigestUtils.sha256Hex(block.getId() + block.getPreviousHash() +
-                block.getTimeStamp() + block.getTransactionList() + block.getMagicNumber());
+        Gson gson = new Gson();
+        String json = gson.toJson(block);
+        return DigestUtils.sha256Hex(json);
     }
 
     private TransactionValue getTransactionValue(){

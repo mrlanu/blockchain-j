@@ -14,16 +14,20 @@ public class Node {
         return SingletonHolder.INSTANCE;
     }
 
-    public static void addTransaction(){
-        getInstance().addTransaction();
+    public static boolean addTransaction(){
+        return getInstance().addTransaction();
     }
 
     public static void printOpenTransactions(){
         getInstance().printOpenTransactions();
     }
 
-    public static void mineNewBlock(){
-        getInstance().mineBlock();
+    public static void printChain(){
+        getInstance().printChain();
+    }
+
+    public static boolean mineNewBlock(){
+        return getInstance().mineBlock();
     }
 
     public static boolean verifyChain(){

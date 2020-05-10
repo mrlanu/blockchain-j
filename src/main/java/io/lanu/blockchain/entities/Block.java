@@ -19,7 +19,6 @@ public class Block implements Serializable {
     private long id;
     private long timeStamp; //as number of milliseconds since 1/1/1970.
     private String previousHash;
-    private String hash;
     private long magicNumber;
     private List<Transaction> transactionList;
 
