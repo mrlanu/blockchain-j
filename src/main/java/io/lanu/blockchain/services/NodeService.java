@@ -8,6 +8,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public final class NodeService {
@@ -16,6 +17,7 @@ public final class NodeService {
     private double reward = 10;
     private final String OWNER = "Serhiy";
     private Wallet wallet;
+    private static int DIFFICULTY = 4;
 
     private NodeService(Wallet wallet) {
         this.wallet = wallet;
@@ -42,12 +44,20 @@ public final class NodeService {
         List<Transaction> copyTransactions = new ArrayList<>(openTransactionsList);
         copyTransactions.add(new Transaction("MINING", OWNER, reward, ""));
         Block block = new Block(chain.size() + 1, previousHash, copyTransactions);
-        //proofOfWork(block);
+        proofOfWork(block);
         chain.add(block);
         openTransactionsList.clear();
         //writeChainToFile();
         //System.out.println("Block has been mined.");
         return true;
+    }
+
+    private void proofOfWork(Block block){
+        String target = new String(new char[DIFFICULTY]).replace('\0', '0');
+        Random random = new Random();
+        while(!hashBlock(block).substring(0, DIFFICULTY).equals(target)) {
+            block.setNonce(random.nextLong());
+        }
     }
 
     public void printChain(){
@@ -94,7 +104,7 @@ public final class NodeService {
     }
 
     public void hackChain(){
-        chain.get(1).setMagicNumber(5);
+        chain.get(1).setNonce(5);
     }
 
     private String hashBlock(Block block){
