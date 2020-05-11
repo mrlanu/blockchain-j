@@ -38,8 +38,4 @@ public class Node {
         return getInstance().getBalance(participant);
     }
 
-    public static void hackChain(){
-        getInstance().hackChain();
-    }
-
 }

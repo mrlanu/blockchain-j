@@ -37,9 +37,6 @@ public class Main {
                     printChain();
                 }else System.out.println("Error.");
             }
-            if (choice.equals("h")){
-                hackChain();
-            }
             if (choice.equals("q")){
                 scanner.close();
                 break;
@@ -54,10 +51,9 @@ public class Main {
 
     private static void printChoice(){
         System.out.println();
-        System.out.println("Please choose.");
-        System.out.println("1 - Add new Transaction");
-        System.out.println("2 - Mine new Block");
-        System.out.println("h - hack chain");
-        System.out.println("q - quit");
+        System.out.println("Please choose: ");
+        System.out.println("\t1 - Add new Transaction");
+        System.out.println("\t2 - Mine new Block");
+        System.out.println("\tq - quit");
     }
 }

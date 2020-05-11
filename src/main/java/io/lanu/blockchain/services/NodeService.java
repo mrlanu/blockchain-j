@@ -1,15 +1,14 @@
 package io.lanu.blockchain.services;
 
-import com.google.gson.Gson;
 import io.lanu.blockchain.entities.Block;
 import io.lanu.blockchain.entities.Transaction;
 import io.lanu.blockchain.util.Wallet;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
+
+import static io.lanu.blockchain.util.Util.*;
 
 public final class NodeService {
     private final List<Block> chain = new ArrayList<>();
@@ -32,7 +31,7 @@ public final class NodeService {
         Block genesisBlock = new Block(1L, "none", new ArrayList<>());
         proofOfWork(genesisBlock);
         chain.add(genesisBlock);
-        //writeChainToFile();
+        writeChainToFile(chain);
     }
 
     public boolean addTransaction(){
@@ -40,6 +39,7 @@ public final class NodeService {
         Transaction transaction = new Transaction(OWNER, value.recipient, value.amount, "");
         if (verifyTransaction(transaction)){
             openTransactionsList.add(transaction);
+            writeOpenTxToFile(openTransactionsList);
             return true;
         }
         return false;
@@ -47,19 +47,6 @@ public final class NodeService {
 
     private boolean verifyTransaction(Transaction transaction){
         return getBalance(transaction.getSender()) >= transaction.getAmount();
-    }
-
-    public void printOpenTransactions(){
-        openTransactionsList.forEach(System.out::println);
-    }
-
-    private TransactionValue getTransactionValue(){
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Recipient - ");
-        String recipient = scanner.nextLine();
-        System.out.println("Amount - ");
-        double amount = scanner.nextDouble();
-        return new TransactionValue(recipient, amount);
     }
 
     public double getBalance(String participant){
@@ -84,9 +71,9 @@ public final class NodeService {
         Block block = new Block(chain.size() + 1, previousHash, copyTransactions);
         proofOfWork(block);
         chain.add(block);
+        writeChainToFile(chain);
         openTransactionsList.clear();
-        //writeChainToFile();
-        //System.out.println("Block has been mined.");
+        writeOpenTxToFile(openTransactionsList);
         return true;
     }
 
@@ -96,17 +83,6 @@ public final class NodeService {
         while(!hashBlock(block).substring(0, DIFFICULTY).equals(target)) {
             block.setNonce(random.nextLong());
         }
-    }
-
-    private String hashBlock(Block block){
-        Gson gson = new Gson();
-        String json = gson.toJson(block);
-        return DigestUtils.sha256Hex(json);
-    }
-
-    public void printChain(){
-        System.out.println();
-        chain.forEach(b -> System.out.println(b + "\n"));
     }
 
     public Boolean verifyChain() {
@@ -122,11 +98,17 @@ public final class NodeService {
         return true;
     }
 
-    public void hackChain(){
-        chain.get(1).setNonce(5);
+    public void printChain(){
+        System.out.println();
+        chain.forEach(b -> System.out.println(b + "\n"));
     }
 
-    private static class TransactionValue{
+    public void printOpenTransactions(){
+        openTransactionsList.forEach(System.out::println);
+    }
+
+
+    public static class TransactionValue{
         private String recipient;
         private double amount;
 
