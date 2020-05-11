@@ -45,6 +45,37 @@ public final class NodeService {
         return false;
     }
 
+    private boolean verifyTransaction(Transaction transaction){
+        return getBalance(transaction.getSender()) >= transaction.getAmount();
+    }
+
+    public void printOpenTransactions(){
+        openTransactionsList.forEach(System.out::println);
+    }
+
+    private TransactionValue getTransactionValue(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Recipient - ");
+        String recipient = scanner.nextLine();
+        System.out.println("Amount - ");
+        double amount = scanner.nextDouble();
+        return new TransactionValue(recipient, amount);
+    }
+
+    public double getBalance(String participant){
+        double openTransactionsSpent = openTransactionsList.stream()
+                .filter(t -> t.getSender().equals(participant))
+                .mapToDouble(t -> -t.getAmount())
+                .sum();
+        double storedTransactionsBalance = chain.stream()
+                .flatMap(t -> t.getTransactionList()
+                        .stream())
+                .filter(t -> t.getSender().equals(participant) || t.getRecipient().equals(participant))
+                .mapToDouble(t -> t.getRecipient().equals(participant) ? t.getAmount() : -t.getAmount())
+                .sum();
+        return storedTransactionsBalance + openTransactionsSpent;
+    }
+
     public boolean mineBlock() {
         Block prevBlock = chain.get(chain.size() - 1);
         String previousHash = hashBlock(prevBlock);
@@ -67,41 +98,22 @@ public final class NodeService {
         }
     }
 
+    private String hashBlock(Block block){
+        Gson gson = new Gson();
+        String json = gson.toJson(block);
+        return DigestUtils.sha256Hex(json);
+    }
+
     public void printChain(){
         System.out.println();
         chain.forEach(b -> System.out.println(b + "\n"));
     }
 
-    public void printOpenTransactions(){
-        openTransactionsList.forEach(System.out::println);
-    }
-
-    public double getBalance(String participant){
-        double openTransactionsSpent = openTransactionsList.stream()
-                .filter(t -> t.getSender().equals(participant))
-                .mapToDouble(t -> -t.getAmount())
-                .sum();
-        double storedTransactionsBalance = chain.stream()
-                .flatMap(t -> t.getTransactionList()
-                        .stream())
-                        .filter(t -> t.getSender().equals(participant) || t.getRecipient().equals(participant))
-                        .mapToDouble(t -> t.getRecipient().equals(participant) ? t.getAmount() : -t.getAmount())
-                        .sum();
-        return storedTransactionsBalance + openTransactionsSpent;
-    }
-
-    private boolean verifyTransaction(Transaction transaction){
-        return getBalance(transaction.getSender()) >= transaction.getAmount();
-    }
-
     public Boolean verifyChain() {
-        Block currentBlock;
-        Block previousBlock;
-
         //loop through the chain to check hashes:
         for(int i = 1; i < chain.size(); i++) {
-            currentBlock = chain.get(i);
-            previousBlock = chain.get(i-1);
+            Block currentBlock = chain.get(i);
+            Block previousBlock = chain.get(i-1);
             //compare registered hash and calculated hash:
             if(!currentBlock.getPreviousHash().equals(hashBlock(previousBlock))){
                 return false;
@@ -113,22 +125,6 @@ public final class NodeService {
     public void hackChain(){
         chain.get(1).setNonce(5);
     }
-
-    private String hashBlock(Block block){
-        Gson gson = new Gson();
-        String json = gson.toJson(block);
-        return DigestUtils.sha256Hex(json);
-    }
-
-    private TransactionValue getTransactionValue(){
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Recipient - ");
-        String recipient = scanner.nextLine();
-        System.out.println("Amount - ");
-        double amount = scanner.nextDouble();
-        return new TransactionValue(recipient, amount);
-    }
-
 
     private static class TransactionValue{
         private String recipient;
