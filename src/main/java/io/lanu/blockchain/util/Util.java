@@ -2,15 +2,16 @@ package io.lanu.blockchain.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.lanu.blockchain.entities.Block;
 import io.lanu.blockchain.entities.Transaction;
 import io.lanu.blockchain.services.NodeService;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Util {
 
@@ -41,6 +42,18 @@ public class Util {
         }
     }
 
+    public static List<Block> readChainFromFile() {
+        List<Block> chain = new ArrayList<>();
+        Gson gson = new GsonBuilder().create();
+        try (FileReader reader = new FileReader(CHAIN_FILE_PATH)){
+            chain = gson.fromJson(reader, new TypeToken<List<Block>>() {}.getType());
+        } catch (IOException e){
+            System.out.println("File with a chain has been created.");
+            return chain;
+        }
+        return chain;
+    }
+
     public static void writeOpenTxToFile(List<Transaction> transactions){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter(TX_FILE_PATH)){
@@ -48,5 +61,17 @@ public class Util {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<Transaction> readOpenTxFromFile() {
+        List<Transaction> transactions = new ArrayList<>();
+        Gson gson = new GsonBuilder().create();
+        try (FileReader reader = new FileReader(TX_FILE_PATH)){
+            transactions = gson.fromJson(reader, new TypeToken<List<Transaction>>() {}.getType());
+        } catch (IOException e){
+            System.out.println("File with open transactions has been created.");
+            return transactions;
+        }
+        return transactions;
     }
 }

@@ -4,6 +4,7 @@ import io.lanu.blockchain.entities.Block;
 import io.lanu.blockchain.entities.Transaction;
 import io.lanu.blockchain.util.Wallet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,8 +12,8 @@ import java.util.Random;
 import static io.lanu.blockchain.util.Util.*;
 
 public final class NodeService {
-    private final List<Block> chain = new ArrayList<>();
-    private final List<Transaction> openTransactionsList = new ArrayList<>();
+    private List<Block> chain = new ArrayList<>();
+    private List<Transaction> openTransactionsList = new ArrayList<>();
     private double reward = 10;
     private final String OWNER = "Serhiy";
     private Wallet wallet;
@@ -20,7 +21,15 @@ public final class NodeService {
 
     private NodeService(Wallet wallet) {
         this.wallet = wallet;
-        createGenesisBlock();
+        init();
+    }
+
+    private void init(){
+        chain = readChainFromFile();
+        if (chain.size() == 0){
+            createGenesisBlock();
+        }
+        openTransactionsList = readOpenTxFromFile();
     }
 
     public static NodeService ignite() {
