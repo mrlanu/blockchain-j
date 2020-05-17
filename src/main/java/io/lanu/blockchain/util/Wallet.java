@@ -3,12 +3,14 @@ package io.lanu.blockchain.util;
 import io.lanu.blockchain.entities.Transaction;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -59,13 +61,38 @@ public class Wallet {
         return Hex.encodeHexString(getPublicKey().getEncoded());
     }
 
-    public Transaction signTransaction(Transaction transaction) throws Exception{
-        Signature rsa = Signature.getInstance("SHA1withRSA");
-        rsa.initSign(getPrivateKey());
-        rsa.update(transaction.getHash().getBytes());
-        byte[] signature = rsa.sign();
-        transaction.setSignature(Hex.encodeHexString(signature));
-        return transaction;
+    public String signTransaction(String sender, String recipient, double amount){
+        String signature = null;
+        try {
+            Signature rsa = Signature.getInstance("SHA1withRSA");
+            rsa.initSign(getPrivateKey());
+            String hashedData = DigestUtils.sha256Hex(sender + recipient + amount);
+            rsa.update(hashedData.getBytes());
+            byte[] sig = rsa.sign();
+            signature =  Hex.encodeHexString(sig);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return signature;
+    }
+
+    public boolean verifyTransaction(Transaction transaction){
+        if (transaction.getSender().equals("MINING")){
+            return true;
+        }
+        try {
+            byte[] keyBytes = Hex.decodeHex(transaction.getSender().toCharArray());
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = kf.generatePublic(spec);
+            Signature sig = Signature.getInstance("SHA1withRSA");
+            sig.initVerify(publicKey);
+            sig.update(transaction.getHash().getBytes());
+            return sig.verify(Hex.decodeHex(transaction.getSignature().toCharArray()));
+        } catch (DecoderException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void loadPrivate(String filename, String algorithm) throws Exception {

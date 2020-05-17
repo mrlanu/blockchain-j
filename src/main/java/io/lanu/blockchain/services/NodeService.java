@@ -27,8 +27,6 @@ public final class NodeService {
             wallet.createKeys(1024, "RSA");
             wallet.writeKeyToFile("KeyPair/publicKey", wallet.getPublicKey().getEncoded());
             wallet.writeKeyToFile("KeyPair/privateKey", wallet.getPrivateKey().getEncoded());
-            //wallet.loadKeyPair("RSA");
-            //wallet.printKeys();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,8 +63,9 @@ public final class NodeService {
 
     public boolean addTransaction(){
         TransactionValue value = getTransactionValue();
-        Transaction transaction = new Transaction(wallet.getPublicKeyAsString(), value.recipient, value.amount, "");
-        if (verifyTransaction(transaction)){
+        String signature = wallet.signTransaction(wallet.getPublicKeyAsString(), value.recipient, value.amount);
+        Transaction transaction = new Transaction(wallet.getPublicKeyAsString(), value.recipient, value.amount, signature);
+        if (verifyTransactionBalance(transaction)){
             openTransactionsList.add(transaction);
             writeOpenTxToFile(openTransactionsList);
             return true;
@@ -74,7 +73,7 @@ public final class NodeService {
         return false;
     }
 
-    private boolean verifyTransaction(Transaction transaction){
+    private boolean verifyTransactionBalance(Transaction transaction){
         return getBalance() >= transaction.getAmount();
     }
 
@@ -96,6 +95,11 @@ public final class NodeService {
     public boolean mineBlock() {
         Block prevBlock = chain.get(chain.size() - 1);
         String previousHash = hashBlock(prevBlock);
+        for (Transaction tr : openTransactionsList) {
+            if (!wallet.verifyTransaction(tr)){
+                return false;
+            }
+        }
         List<Transaction> copyTransactions = new ArrayList<>(openTransactionsList);
         copyTransactions.add(new Transaction("MINING", wallet.getPublicKeyAsString(), reward, ""));
         Block block = new Block(chain.size() + 1, previousHash, copyTransactions);
