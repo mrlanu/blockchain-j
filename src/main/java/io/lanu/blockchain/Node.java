@@ -1,6 +1,8 @@
 package io.lanu.blockchain;
 
 import io.lanu.blockchain.services.NodeService;
+import io.lanu.blockchain.util.Wallet;
+
 import static io.lanu.blockchain.services.NodeService.ignite;
 
 
@@ -34,8 +36,14 @@ public class Node {
         return getInstance().verifyChain();
     }
 
-    public static double getBalance(String participant){
-        return getInstance().getBalance(participant);
+    public static double getBalance(){
+        return getInstance().getBalance();
     }
+
+    public static void createWallet(){getInstance().createWallet();}
+
+    public static void loadWallet(){getInstance().loadWallet();}
+
+    public static Wallet getWallet(){return getInstance().getWallet();}
 
 }

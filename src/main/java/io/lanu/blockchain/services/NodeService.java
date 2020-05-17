@@ -14,18 +14,38 @@ public final class NodeService {
     private List<Block> chain = new ArrayList<>();
     private List<Transaction> openTransactionsList = new ArrayList<>();
     private double reward = 10;
-    private final String OWNER = "Serhiy";
     private Wallet wallet;
     private static int DIFFICULTY = 4;
 
-    private NodeService(Wallet wallet) {
-        this.wallet = wallet;
+    private NodeService() {
         init();
+    }
+
+    public void createWallet() {
+        wallet = new Wallet();
+        try {
+            wallet.createKeys(1024, "RSA");
+            wallet.writeKeyToFile("KeyPair/publicKey", wallet.getPublicKey().getEncoded());
+            wallet.writeKeyToFile("KeyPair/privateKey", wallet.getPrivateKey().getEncoded());
+            //wallet.loadKeyPair("RSA");
+            //wallet.printKeys();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadWallet(){
+        wallet = new Wallet();
+        try {
+            wallet.loadKeyPair("RSA");
+            //wallet.printKeys();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void init(){
         chain = readChainFromFile();
-        verifyChain();
         if (chain.size() == 0){
             createGenesisBlock();
         }
@@ -33,7 +53,7 @@ public final class NodeService {
     }
 
     public static NodeService ignite() {
-        return new NodeService(null);
+        return new NodeService();
     }
 
     private void createGenesisBlock() {
@@ -45,7 +65,7 @@ public final class NodeService {
 
     public boolean addTransaction(){
         TransactionValue value = getTransactionValue();
-        Transaction transaction = new Transaction(OWNER, value.recipient, value.amount, "");
+        Transaction transaction = new Transaction(wallet.getPublicKeyAsString(), value.recipient, value.amount, "");
         if (verifyTransaction(transaction)){
             openTransactionsList.add(transaction);
             writeOpenTxToFile(openTransactionsList);
@@ -55,10 +75,11 @@ public final class NodeService {
     }
 
     private boolean verifyTransaction(Transaction transaction){
-        return getBalance(transaction.getSender()) >= transaction.getAmount();
+        return getBalance() >= transaction.getAmount();
     }
 
-    public double getBalance(String participant){
+    public double getBalance(){
+        String participant = wallet.getPublicKeyAsString();
         double openTransactionsSpent = openTransactionsList.stream()
                 .filter(t -> t.getSender().equals(participant))
                 .mapToDouble(t -> -t.getAmount())
@@ -76,7 +97,7 @@ public final class NodeService {
         Block prevBlock = chain.get(chain.size() - 1);
         String previousHash = hashBlock(prevBlock);
         List<Transaction> copyTransactions = new ArrayList<>(openTransactionsList);
-        copyTransactions.add(new Transaction("MINING", OWNER, reward, ""));
+        copyTransactions.add(new Transaction("MINING", wallet.getPublicKeyAsString(), reward, ""));
         Block block = new Block(chain.size() + 1, previousHash, copyTransactions);
         proofOfWork(block);
         chain.add(block);
@@ -116,6 +137,9 @@ public final class NodeService {
         openTransactionsList.forEach(System.out::println);
     }
 
+    public Wallet getWallet() {
+        return wallet;
+    }
 
     public static class TransactionValue{
         private String recipient;

@@ -55,6 +55,10 @@ public class Wallet {
         // Hex.decodeHex(string.toCharArray());
     }
 
+    public String getPublicKeyAsString(){
+        return Hex.encodeHexString(getPublicKey().getEncoded());
+    }
+
     public Transaction signTransaction(Transaction transaction) throws Exception{
         Signature rsa = Signature.getInstance("SHA1withRSA");
         rsa.initSign(getPrivateKey());
