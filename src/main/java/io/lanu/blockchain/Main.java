@@ -37,6 +37,12 @@ public class Main {
                     printChain();
                 }else System.out.println("Error.");
             }
+            if (choice.equals("3")){
+                    printChain();
+            }
+            if (choice.equals("4")){
+                printOpenTransactions();
+            }
             if (choice.equals("q")){
                 scanner.close();
                 break;
@@ -54,6 +60,8 @@ public class Main {
         System.out.println("Please choose: ");
         System.out.println("\t1 - Add new Transaction");
         System.out.println("\t2 - Mine new Block");
+        System.out.println("\t3 - Print the chain");
+        System.out.println("\t4 - Print the open Transactions");
         System.out.println("\tq - quit");
     }
 }

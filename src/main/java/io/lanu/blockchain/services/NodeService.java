@@ -4,7 +4,6 @@ import io.lanu.blockchain.entities.Block;
 import io.lanu.blockchain.entities.Transaction;
 import io.lanu.blockchain.util.Wallet;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -26,6 +25,7 @@ public final class NodeService {
 
     private void init(){
         chain = readChainFromFile();
+        verifyChain();
         if (chain.size() == 0){
             createGenesisBlock();
         }
