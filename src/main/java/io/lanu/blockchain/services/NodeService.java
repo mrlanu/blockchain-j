@@ -65,7 +65,7 @@ public final class NodeService {
         TransactionValue value = getTransactionValue();
         String signature = wallet.signTransaction(wallet.getPublicKeyAsString(), value.recipient, value.amount);
         Transaction transaction = new Transaction(wallet.getPublicKeyAsString(), value.recipient, value.amount, signature);
-        if (verifyTransactionBalance(transaction)){
+        if (verifyTransaction(transaction)){
             openTransactionsList.add(transaction);
             writeOpenTxToFile(openTransactionsList);
             return true;
@@ -73,8 +73,8 @@ public final class NodeService {
         return false;
     }
 
-    private boolean verifyTransactionBalance(Transaction transaction){
-        return getBalance() >= transaction.getAmount();
+    private boolean verifyTransaction(Transaction transaction){
+        return getBalance() >= transaction.getAmount() && wallet.verifyTransaction(transaction);
     }
 
     public double getBalance(){
